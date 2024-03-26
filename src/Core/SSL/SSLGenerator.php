@@ -6,34 +6,41 @@ class SSLGenerator
 {
     protected $rootFolder;
 
-    public function __construct()
+    public function __construct(string $rootFolder = "")
     {
-        $this->rootFolder = rtrim(__DIR__, '/') . '/';
+        $this->rootFolder = rtrim($rootFolder ?: __DIR__, '/') . '/';
     }
 
+    protected function generatePrivateKey(int $keyLength = 2048)
+    {
+        return openssl_pkey_new([
+            "digest_alg" => "sha512",
+            "private_key_bits" => $keyLength,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        ]);
+    }
 
     /**
-     * Generate SSL files including private key, CSR, and self-signed certificate.
+     * Generate SSL files and return their paths as a JSON string.
      *
-     * @param string $domain The domain name for the certificate.
-     * @param array $csrDetails The details for the CSR fields.
-     * @param int $keyLength The length of the private key in bits (default is 2048).
-     * @return array An associative array containing the paths to the generated files.
+     * @param string $domain
+     * @param array $csrDetails
+     * @param int $keyLength
+     * @return string JSON-encoded string containing paths to generated SSL files
      */
-    public function generateSSLFiles(string $domain, array $csrDetails, int $keyLength = 2048): array
+    public function generateSSLFiles(string $domain, array $csrDetails, int $keyLength = 2048): string
     {
-        // Generate a new private key.
-        $privateKey = openssl_pkey_new(
-            array(
-                "digest_alg" => "sha512",
-                "private_key_bits" => $keyLength,
-                "private_key_type" => OPENSSL_KEYTYPE_RSA,
-            )
-        );
+        $privateKey = $this->generatePrivateKey($keyLength);
 
         $csr = openssl_csr_new($csrDetails, $privateKey);
+        if (!$csr) {
+            throw new \RuntimeException("Failed to generate CSR");
+        }
 
         $cert = openssl_csr_sign($csr, null, $privateKey, 365);
+        if (!$cert) {
+            throw new \RuntimeException("Failed to sign CSR");
+        }
 
         $privateKeyPath = $this->rootFolder . 'private.key';
         openssl_pkey_export_to_file($privateKey, $privateKeyPath);
@@ -44,10 +51,43 @@ class SSLGenerator
         $certPath = $this->rootFolder . 'certificate.crt';
         openssl_x509_export_to_file($cert, $certPath);
 
-        return array(
+        return json_encode([
             'privateKeyPath' => $privateKeyPath,
             'csrPath' => $csrPath,
             'certPath' => $certPath
-        );
+        ]);
+    }
+
+    /**
+     * Generate SSL strings and return them as an array.
+     *
+     * @param string $domain
+     * @param array $csrDetails
+     * @param int $keyLength
+     * @return array
+     */
+    public function generateSSLStrings(string $domain, array $csrDetails, int $keyLength = 2048): array
+    {
+        $privateKey = $this->generatePrivateKey($keyLength);
+
+        $csr = openssl_csr_new($csrDetails, $privateKey);
+        if (!$csr) {
+            throw new \RuntimeException("Failed to generate CSR");
+        }
+
+        $cert = openssl_csr_sign($csr, null, $privateKey, 365);
+        if (!$cert) {
+            throw new \RuntimeException("Failed to sign CSR");
+        }
+
+        openssl_pkey_export($privateKey, $privateKeyString);
+        openssl_csr_export($csr, $csrString);
+        openssl_x509_export($cert, $certString);
+
+        return [
+            'privateKey' => $privateKeyString,
+            'csr' => $csrString,
+            'cert' => $certString
+        ];
     }
 }
