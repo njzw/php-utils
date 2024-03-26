@@ -1,6 +1,6 @@
 <?php
 
-namespace Nigel\SslGenerator\Utils\Checksums;
+namespace Nigel\Utils\Core\Checksums;
 
 use Exception;
 

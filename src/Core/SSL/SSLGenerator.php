@@ -1,6 +1,6 @@
 <?php
 
-namespace Nigel\SslGenerator\Core;
+namespace Nigel\Utils\Core\SSL;
 
 class SSLGenerator
 {
