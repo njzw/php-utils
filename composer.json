@@ -1,19 +1,20 @@
 {
-    "name": "nigel/utils",
-    "description": "Util Files",
-    "type": "library",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Nigel\\Utils\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "njzw",
-            "email": "nigeljaure@icloud.com"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {}
+  "version": "1.0.0",
+  "name": "nigel/utils",
+  "description": "Util Files",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Nigel\\Utils\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "njzw",
+      "email": "nigeljaure@icloud.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {}
 }
