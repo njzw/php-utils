@@ -1,5 +1,12 @@
 PHP Util Scripts
 
+## Installation
+
+```
+ composer require nigel/utils
+```
+
+
 ---
 
 # 1. SSL Certificate Generator
@@ -82,3 +89,70 @@ $checksum = (new ContipayChecksum())->generateChecksum($authKey . $reference . $
 echo $checksum;
 ?>
 ```
+
+## 3. Phone Helper
+
+This script utilizes a custom wrapper around the 'giggsey/libphonenumber-for-php' library to format and validate phone numbers.
+
+
+### Example
+
+```php
+<?php
+
+use Nigel\Utils\Core\Phone\Phone;
+
+require_once './app/bootstrap.php';
+
+header('Content-type: application/json');
+
+$phone = "0782000340"; // Zimbabwe Econet Number
+
+$test = (new Phone($phone, 'ZW'))->internationalFormat();
+
+
+echo $test;
+
+
+```
+
+---
+
+### Response
+
+```
+
+263782000340
+
+```
+
+---
+
+### Available Methods
+
+1. isValid()
+
+- check if number is valid or not
+
+
+2. internationalFormat()
+
+- get international format from the parsed number
+
+3. nationalFormat()
+
+- get national format from the parsed number
+
+4. getCountry()
+
+- get country name from the parsed number
+
+5. providerInfo()
+
+- get provider info from the parsed number
+
+6. timeZoneInfo()
+
+- get timezone info from the parsed number
+
+---
